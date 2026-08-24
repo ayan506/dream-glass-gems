@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
-import { Logo, WHATSAPP_LINK } from "./Brand";
+import { Logo } from "./Brand";
+import { useSiteContent, whatsappLink } from "@/lib/site-content";
 
 const links = [
   { label: "Services", href: "#services" },
+  { label: "Story", href: "#story" },
   { label: "Products", href: "#products" },
   { label: "Projects", href: "#projects" },
   { label: "Contact", href: "#contact" },
@@ -11,6 +13,8 @@ const links = [
 export function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const { contact } = useSiteContent();
+  const waLink = whatsappLink(contact.whatsapp, "Hi Dream Glass Collection, I would like to enquire about your glass solutions.");
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -51,7 +55,7 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-3">
-          <a href={WHATSAPP_LINK} target="_blank" rel="noreferrer" className="btn-primary hidden sm:inline-flex">
+          <a href={waLink} target="_blank" rel="noreferrer" className="btn-primary hidden sm:inline-flex">
             WhatsApp Now
           </a>
           <button
@@ -79,7 +83,7 @@ export function Header() {
               {l.label}
             </a>
           ))}
-          <a href={WHATSAPP_LINK} target="_blank" rel="noreferrer" className="btn-primary mt-4 w-full justify-center">
+          <a href={waLink} target="_blank" rel="noreferrer" className="btn-primary mt-4 w-full justify-center">
             WhatsApp Now
           </a>
         </nav>
