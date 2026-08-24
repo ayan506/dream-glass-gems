@@ -1,20 +1,19 @@
-import logo from "@/assets/logo-round.asset.json";
+import logo from "@/assets/logo-round.png";
 
-/** WhatsApp is available on this number only. */
+/**
+ * Default contact details — used as the SSR fallback and by the admin panel's
+ * "reset to defaults". The live site reads these from site content, editable
+ * in the admin panel (Contact tab).
+ */
 export const WHATSAPP_NUMBER = "9837866559";
-/** Both numbers are used for calls across the site. */
 export const PHONE_NUMBERS = ["9837866559", "9897055261"] as const;
 
-export const WHATSAPP_LINK = `https://wa.me/91${WHATSAPP_NUMBER}?text=${encodeURIComponent(
-  "Hi Dream Glass Collection, I would like to enquire about your glass solutions.",
-)}`;
-
-export const LOGO_URL = logo.url;
+export const LOGO_URL = logo;
 
 export function Logo({ className = "h-11 w-11" }: { className?: string }) {
   return (
     <img
-      src={logo.url}
+      src={logo}
       alt="Dream Glass Collection logo"
       className={`${className} rounded-full object-contain select-none`}
       width={96}
