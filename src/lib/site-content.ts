@@ -1,5 +1,3 @@
-import { useCallback, useEffect, useState } from "react";
-
 import cRailing from "@/assets/c-railing.jpg";
 import cToughened from "@/assets/c-toughened.jpg";
 import cFacade from "@/assets/c-facade.jpg";
@@ -10,10 +8,16 @@ import cAcp from "@/assets/c-acp.jpg";
 import cMirror from "@/assets/c-mirror.jpg";
 import cStaircase from "@/assets/c-staircase.jpg";
 import cSkylight from "@/assets/c-skylight.jpg";
+import pRailing from "@/assets/p-railing.jpg";
+import pShower from "@/assets/p-shower.jpg";
+import pPartition from "@/assets/p-partition.jpg";
+import pFacade from "@/assets/p-facade.jpg";
 
 export type Product = { id: string; title: string; cat: string; img: string; note: string };
-export type Testimonial = { id: string; name: string; role: string; quote: string };
+export type Testimonial = { id: string; name: string; role: string; quote: string; rating: number };
 export type Offer = { id: string; title: string; detail: string; badge: string; active: boolean };
+export type Partner = { id: string; name: string; logo: string; url: string };
+export type GalleryItem = { id: string; title: string; cat: string; img: string; caption: string };
 export type Social = { facebook: string; instagram: string; youtube: string };
 export type StoryMilestone = { value: string; label: string };
 export type Story = {
@@ -38,6 +42,8 @@ export type SiteContent = {
   products: Product[];
   testimonials: Testimonial[];
   offers: Offer[];
+  partners: Partner[];
+  gallery: GalleryItem[];
   social: Social;
   story: Story;
   contact: Contact;
@@ -76,13 +82,34 @@ export const DEFAULT_CONTENT: SiteContent = {
       name: "Ar. Nidhi Sharma",
       role: "Principal Architect",
       quote: "The frameless railing detailing was flawless — the sightlines match our drawings exactly.",
+      rating: 5,
     },
-    { id: "t2", name: "Rohit Gaur", role: "Project Head", quote: "Facade delivered on schedule across three towers. Zero rework." },
-    { id: "t3", name: "Dr. R.P. Singh", role: "Homeowner", quote: "The shower enclosure and mirrors completely transformed our home." },
+    { id: "t2", name: "Rohit Gaur", role: "Project Head", quote: "Facade delivered on schedule across three towers. Zero rework.", rating: 4.5 },
+    { id: "t3", name: "Dr. R.P. Singh", role: "Homeowner", quote: "The shower enclosure and mirrors completely transformed our home.", rating: 5 },
   ],
   offers: [
     { id: "o1", title: "Free Site Survey", detail: "Complimentary measurement and drawing for orders above 100 sq.ft.", badge: "This month", active: true },
     { id: "o2", title: "10% Off Shower Enclosures", detail: "On frameless 10mm enclosures with premium hardware.", badge: "Limited", active: true },
+  ],
+  partners: [
+    { id: "cl1", name: "Lady Group", logo: "", url: "" },
+    { id: "cl2", name: "C.L. Gupta", logo: "", url: "" },
+    { id: "cl3", name: "ATS Infrastructure", logo: "", url: "" },
+    { id: "cl4", name: "Gaur Group", logo: "", url: "" },
+    { id: "cl5", name: "Wave City", logo: "", url: "" },
+    { id: "cl6", name: "Mahagun", logo: "", url: "" },
+    { id: "cl7", name: "Supertech", logo: "", url: "" },
+    { id: "cl8", name: "Ajnara Homes", logo: "", url: "" },
+  ],
+  gallery: [
+    { id: "g1", title: "Luxury Villa Railings", cat: "Railings", img: pRailing, caption: "Frameless 12mm toughened glass with satin spigots." },
+    { id: "g2", title: "Corporate Tower Facade", cat: "Facades", img: pFacade, caption: "Structural glazing across three towers." },
+    { id: "g3", title: "Head Office Partitions", cat: "Partitions", img: pPartition, caption: "Double glazed acoustic partitions, slim profile." },
+    { id: "g4", title: "Residence Bath Suite", cat: "Enclosures", img: pShower, caption: "10mm frameless enclosure with gold hardware." },
+    { id: "g5", title: "Backlit Mirror Wall", cat: "Mirrors", img: cMirror, caption: "Custom LED mirror with anti-fog film." },
+    { id: "g6", title: "Fluted Feature Glass", cat: "Decorative", img: cDecorative, caption: "Back-painted and fluted design glass." },
+    { id: "g7", title: "Glass Canopy", cat: "Skylights", img: cSkylight, caption: "Laminated, weather sealed skylight." },
+    { id: "g8", title: "Staircase Railing", cat: "Staircases", img: cStaircase, caption: "Wooden handrail on frameless glass." },
   ],
   social: {
     facebook: "https://facebook.com/",
@@ -114,14 +141,17 @@ export const DEFAULT_CONTENT: SiteContent = {
   },
 };
 
-const KEY = "dgc.site-content.v2";
-const EVENT = "dgc:content";
-
-function mergeContent(parsed: Partial<SiteContent>): SiteContent {
+/** Fills any missing keys from the defaults so older saved payloads keep working. */
+export function mergeContent(parsed: Partial<SiteContent>): SiteContent {
   return {
     products: parsed.products ?? DEFAULT_CONTENT.products,
-    testimonials: parsed.testimonials ?? DEFAULT_CONTENT.testimonials,
+    testimonials: (parsed.testimonials ?? DEFAULT_CONTENT.testimonials).map((t) => ({
+      ...t,
+      rating: typeof t.rating === "number" ? t.rating : 5,
+    })),
     offers: parsed.offers ?? DEFAULT_CONTENT.offers,
+    partners: parsed.partners ?? DEFAULT_CONTENT.partners,
+    gallery: parsed.gallery ?? DEFAULT_CONTENT.gallery,
     social: { ...DEFAULT_CONTENT.social, ...(parsed.social ?? {}) },
     story: {
       ...DEFAULT_CONTENT.story,
@@ -135,46 +165,6 @@ function mergeContent(parsed: Partial<SiteContent>): SiteContent {
       phones: parsed.contact?.phones ?? DEFAULT_CONTENT.contact.phones,
     },
   };
-}
-
-export function loadContent(): SiteContent {
-  if (typeof window === "undefined") return DEFAULT_CONTENT;
-  try {
-    const raw = window.localStorage.getItem(KEY);
-    if (!raw) return DEFAULT_CONTENT;
-    return mergeContent(JSON.parse(raw) as Partial<SiteContent>);
-  } catch {
-    return DEFAULT_CONTENT;
-  }
-}
-
-export function saveContent(content: SiteContent) {
-  window.localStorage.setItem(KEY, JSON.stringify(content));
-  window.dispatchEvent(new CustomEvent(EVENT));
-}
-
-export function resetContent() {
-  window.localStorage.removeItem(KEY);
-  window.dispatchEvent(new CustomEvent(EVENT));
-}
-
-/** SSR renders defaults; the browser swaps in saved content after hydration. */
-export function useSiteContent() {
-  const [content, setContent] = useState<SiteContent>(DEFAULT_CONTENT);
-
-  const sync = useCallback(() => setContent(loadContent()), []);
-
-  useEffect(() => {
-    sync();
-    window.addEventListener(EVENT, sync);
-    window.addEventListener("storage", sync);
-    return () => {
-      window.removeEventListener(EVENT, sync);
-      window.removeEventListener("storage", sync);
-    };
-  }, [sync]);
-
-  return content;
 }
 
 export const newId = () => Math.random().toString(36).slice(2, 10);
