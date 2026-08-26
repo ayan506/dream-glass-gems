@@ -69,10 +69,10 @@ export const deleteQuote = createServerFn({ method: "POST" })
 
 export const uploadMedia = createServerFn({ method: "POST" })
   .inputValidator((data: { passcode: string; filename: string; contentType: string; base64: string }) => {
-    if (!/^image\/(png|jpeg|jpg|webp|gif|avif|svg\+xml)$/.test(data.contentType)) {
-      throw new Error("Only image files are allowed.");
+    if (!/^(image\/(png|jpeg|jpg|webp|gif|avif|svg\+xml)|application\/pdf)$/.test(data.contentType)) {
+      throw new Error("Only image or PDF files are allowed.");
     }
-    if (data.base64.length > 8_000_000) throw new Error("Image is too large (max ~5MB).");
+    if (data.base64.length > 20_000_000) throw new Error("File is too large (max ~14MB).");
     return data;
   })
   .handler(async ({ data }) => {
