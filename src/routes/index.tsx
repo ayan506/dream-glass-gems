@@ -7,12 +7,17 @@ import { Reveal, Counter } from "@/components/site/Reveal";
 import { ProductSlider } from "@/components/site/ProductSlider";
 import { SocialLinks } from "@/components/site/Social";
 import { Logo } from "@/components/site/Brand";
+import { Gallery } from "@/components/site/Gallery";
+import { EntranceLoader } from "@/components/site/Loader";
+import { Stars } from "@/components/site/Stars";
+import { submitQuote as submitQuoteFn } from "@/lib/site.functions";
 import {
   CATEGORIES,
   displayNumber,
   telLink,
   useSiteContent,
   whatsappLink,
+  type GalleryItem,
   type Product,
 } from "@/lib/site-content";
 import hero from "@/assets/hero.jpg";
@@ -70,42 +75,39 @@ const projects = [
   { t: "Residence Bath Suite", c: "Residential", img: pShower },
 ];
 
-const clients = [
-  "C.L. Gupta",
-  "Dr. R.P. Singh",
-  "ATS Infrastructure",
-  "Gaur Group",
-  "Wave City",
-  "Mahagun",
-  "Supertech",
-  "Ajnara Homes",
-];
-
 const filterChips = ["All", ...CATEGORIES];
 
 function Index() {
   const content = useSiteContent();
-  const { products, testimonials, offers, social, story, contact } = content;
+  const { products, testimonials, offers, social, story, contact, partners, gallery, brochure, loader } = content;
 
   const [cat, setCat] = useState("All");
   const [lightbox, setLightbox] = useState<{ img: string; title: string } | null>(null);
   const [form, setForm] = useState({ name: "", mobile: "", city: "", service: services[0]!.name, message: "" });
+  const [quoteState, setQuoteState] = useState<"idle" | "sending" | "sent" | "error">("idle");
 
   const filtered = useMemo(() => (cat === "All" ? products : products.filter((p) => p.cat === cat)), [cat, products]);
   const activeOffers = useMemo(() => offers.filter((o) => o.active), [offers]);
 
   const waEnquiry = whatsappLink(contact.whatsapp, "Hi Dream Glass Collection, I would like to enquire about your glass solutions.");
 
-  const submitQuote = (e: React.FormEvent) => {
+  const submitQuote = async (e: React.FormEvent) => {
     e.preventDefault();
-    const text = `New Quote Request\n\nName: ${form.name}\nMobile: ${form.mobile}\nCity: ${form.city}\nService: ${form.service}\nMessage: ${form.message}`;
-    window.open(whatsappLink(contact.whatsapp, text), "_blank");
+    setQuoteState("sending");
+    try {
+      await submitQuoteFn({ data: form });
+      setQuoteState("sent");
+      setForm({ name: "", mobile: "", city: "", service: services[0]!.name, message: "" });
+    } catch {
+      setQuoteState("error");
+    }
   };
 
   const openProduct = (p: Product) => setLightbox({ img: p.img, title: p.title });
 
   return (
     <div id="top" className="min-h-screen bg-background">
+      <EntranceLoader settings={loader} />
       <Header />
       <Assistant />
 
@@ -329,19 +331,50 @@ function Index() {
       </section>
 
       {/* Clients */}
-      <section className="overflow-hidden py-16">
-        <p className="eyebrow text-center">Trusted by leading groups</p>
-        <div className="mt-8 flex gap-12 overflow-x-auto px-5 md:justify-center md:flex-wrap md:gap-x-14 md:gap-y-6">
-          {clients.map((c) => (
-            <span
-              key={c}
-              className="shrink-0 font-display text-lg font-semibold text-muted-foreground/70 transition-colors hover:text-foreground"
-            >
-              {c}
-            </span>
-          ))}
-        </div>
-      </section>
+      {partners.length > 0 && (
+        <section className="overflow-hidden py-16">
+          <p className="eyebrow text-center">Trusted by leading groups</p>
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-x-12 gap-y-6 px-5">
+            {partners.map((c) => {
+              const inner = c.logo ? (
+                <img src={c.logo} alt={c.name} loading="lazy" className="h-10 w-auto object-contain opacity-80 transition-opacity hover:opacity-100" />
+              ) : (
+                <span className="font-display text-lg font-semibold text-muted-foreground/70 transition-colors hover:text-foreground">
+                  {c.name}
+                </span>
+              );
+              return c.url ? (
+                <a key={c.id} href={c.url} target="_blank" rel="noreferrer" className="shrink-0">
+                  {inner}
+                </a>
+              ) : (
+                <span key={c.id} className="shrink-0">
+                  {inner}
+                </span>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
+      <Gallery items={gallery} onOpen={(g: GalleryItem) => setLightbox({ img: g.img, title: g.title })} />
+
+      {brochure.enabled && brochure.url && (
+        <section id="brochure" className="mx-auto max-w-7xl px-5 pb-8 md:px-8">
+          <Reveal>
+            <div className="glass-card flex flex-col items-start gap-5 p-8 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="eyebrow">Brochure</p>
+                <h3 className="mt-3 text-2xl font-semibold">{brochure.label}</h3>
+                <p className="mt-2 max-w-md text-sm text-muted-foreground">{brochure.note}</p>
+              </div>
+              <a href={brochure.url} download={brochure.filename} target="_blank" rel="noreferrer" className="btn-primary shrink-0">
+                Download PDF
+              </a>
+            </div>
+          </Reveal>
+        </section>
+      )}
 
       {/* Testimonials */}
       {testimonials.length > 0 && (
@@ -350,13 +383,7 @@ function Index() {
             {testimonials.map((t, i) => (
               <Reveal key={t.id} delay={i * 110}>
                 <figure className="glass-card h-full p-7">
-                  <div className="flex gap-1 text-primary">
-                    {Array.from({ length: 5 }).map((_, s) => (
-                      <svg key={s} viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4">
-                        <path d="m12 17.3 6.2 3.7-1.6-7 5.4-4.7-7.1-.6L12 2 9.1 8.7 2 9.3l5.4 4.7-1.6 7z" />
-                      </svg>
-                    ))}
-                  </div>
+                  <Stars value={t.rating} />
                   <blockquote className="mt-5 text-sm leading-relaxed text-foreground">“{t.quote}”</blockquote>
                   <figcaption className="mt-6">
                     <span className="block text-sm font-semibold">{t.name}</span>
@@ -426,9 +453,18 @@ function Index() {
                   className="mt-2 w-full rounded-lg border border-border bg-background px-4 py-3 text-sm outline-none focus:border-primary"
                 />
               </label>
-              <button type="submit" className="btn-primary w-full justify-center">
-                Get Free Quote
+              <button type="submit" disabled={quoteState === "sending"} className="btn-primary w-full justify-center">
+                {quoteState === "sending" ? "Sending…" : "Get Free Quote"}
               </button>
+              {quoteState === "sent" && (
+                <p className="text-xs text-primary">Thank you — your request is with our team. We will call you back shortly.</p>
+              )}
+              {quoteState === "error" && (
+                <p className="text-xs text-destructive">
+                  Could not send right now. Please call {displayNumber(contact.phones[0] ?? contact.whatsapp)} or{" "}
+                  <a className="underline" href={waEnquiry} target="_blank" rel="noreferrer">WhatsApp us</a>.
+                </p>
+              )}
             </form>
           </Reveal>
         </div>
@@ -464,6 +500,7 @@ function Index() {
                 ["Our Story", "#story"],
                 ["Our Products", "#products"],
                 ["Projects", "#projects"],
+                ["Gallery", "#gallery"],
                 ["Get a Quote", "#quote"],
               ].map(([l, h]) => (
                 <p key={h}>

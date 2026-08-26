@@ -1,3 +1,6 @@
+import { useQuery } from "@tanstack/react-query";
+
+import { getSiteContent } from "./site.functions";
 import cRailing from "@/assets/c-railing.jpg";
 import cToughened from "@/assets/c-toughened.jpg";
 import cFacade from "@/assets/c-facade.jpg";
@@ -12,6 +15,9 @@ import pRailing from "@/assets/p-railing.jpg";
 import pShower from "@/assets/p-shower.jpg";
 import pPartition from "@/assets/p-partition.jpg";
 import pFacade from "@/assets/p-facade.jpg";
+import { DEFAULT_ASSISTANT, type AssistantSettings } from "./assistant-faqs";
+
+export type { AssistantSettings, Faq } from "./assistant-faqs";
 
 export type Product = { id: string; title: string; cat: string; img: string; note: string };
 export type Testimonial = { id: string; name: string; role: string; quote: string; rating: number };
@@ -19,6 +25,15 @@ export type Offer = { id: string; title: string; detail: string; badge: string; 
 export type Partner = { id: string; name: string; logo: string; url: string };
 export type GalleryItem = { id: string; title: string; cat: string; img: string; caption: string };
 export type Social = { facebook: string; instagram: string; youtube: string };
+export type Brochure = { enabled: boolean; label: string; note: string; url: string; filename: string };
+export type Loader = {
+  enabled: boolean;
+  /** Duration in milliseconds, clamped 800–8000. */
+  durationMs: number;
+  title: string;
+  tagline: string;
+  logo: string;
+};
 export type StoryMilestone = { value: string; label: string };
 export type Story = {
   eyebrow: string;
@@ -47,6 +62,9 @@ export type SiteContent = {
   social: Social;
   story: Story;
   contact: Contact;
+  brochure: Brochure;
+  loader: Loader;
+  assistant: AssistantSettings;
 };
 
 /** The ten grades/categories the catalogue is organised into. */
@@ -135,11 +153,29 @@ export const DEFAULT_CONTENT: SiteContent = {
     phones: ["9837866559", "9897055261"],
     whatsapp: "9837866559",
     address: "Moradabad, Uttar Pradesh, India",
-    hours: "Mon – Sat · 9:30 AM – 8:00 PM",
-    hoursSunday: "Sunday · By appointment",
+    hours: "Open all days · 10:00 AM – 8:00 PM",
+    hoursSunday: "Sunday included · 10:00 AM – 8:00 PM",
     mapQuery: "Moradabad,Uttar+Pradesh,India",
   },
+  brochure: {
+    enabled: false,
+    label: "Dream Glass Collection Brochure",
+    note: "Full product range, glass specifications and finishes in one PDF.",
+    url: "",
+    filename: "dream-glass-brochure.pdf",
+  },
+  loader: {
+    enabled: true,
+    durationMs: 3000,
+    title: "Dream Glass",
+    tagline: "A Studio Of Designer Glasses",
+    logo: "",
+  },
+  assistant: DEFAULT_ASSISTANT,
 };
+
+/** Loader duration is capped to keep the entrance screen sane. */
+export const clampDuration = (ms: number) => Math.min(8000, Math.max(800, Math.round(ms) || 3000));
 
 /** Fills any missing keys from the defaults so older saved payloads keep working. */
 export function mergeContent(parsed: Partial<SiteContent>): SiteContent {
@@ -164,7 +200,32 @@ export function mergeContent(parsed: Partial<SiteContent>): SiteContent {
       ...(parsed.contact ?? {}),
       phones: parsed.contact?.phones ?? DEFAULT_CONTENT.contact.phones,
     },
+    brochure: { ...DEFAULT_CONTENT.brochure, ...(parsed.brochure ?? {}) },
+    loader: {
+      ...DEFAULT_CONTENT.loader,
+      ...(parsed.loader ?? {}),
+      durationMs: clampDuration(parsed.loader?.durationMs ?? DEFAULT_CONTENT.loader.durationMs),
+    },
+    assistant: {
+      ...DEFAULT_CONTENT.assistant,
+      ...(parsed.assistant ?? {}),
+      suggestions: parsed.assistant?.suggestions ?? DEFAULT_CONTENT.assistant.suggestions,
+      faqs: parsed.assistant?.faqs ?? DEFAULT_CONTENT.assistant.faqs,
+    },
   };
+}
+
+/**
+ * Live site content. Reads from the database through a server function and
+ * falls back to the bundled defaults while loading.
+ */
+export function useSiteContent(): SiteContent {
+  const { data } = useQuery({
+    queryKey: ["site-content"],
+    queryFn: () => getSiteContent(),
+    staleTime: 30_000,
+  });
+  return data ?? DEFAULT_CONTENT;
 }
 
 export const newId = () => Math.random().toString(36).slice(2, 10);
