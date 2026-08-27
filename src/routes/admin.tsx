@@ -882,20 +882,13 @@ function Admin() {
                 />
                 Show the loading screen
               </label>
-              <label className="block">
-                <span className="eyebrow">Duration (seconds, 0.8 – 8)</span>
-                <input
-                  type="number"
-                  min={0.8}
-                  max={8}
-                  step={0.1}
-                  value={loader.durationMs / 1000}
-                  onChange={(e) =>
-                    set({ loader: { ...loader, durationMs: clampDuration(Number(e.target.value) * 1000) } })
-                  }
-                  className={input}
-                />
-              </label>
+              <DurationField
+                seconds={loader.durationMs / 1000}
+                onCommit={(secs) => set({ loader: { ...loader, durationMs: clampDuration(secs * 1000) } })}
+              />
+              <p className="text-xs text-muted-foreground">
+                Any value between 0.5 and 10 seconds works — 1.5 to 2 seconds is recommended.
+              </p>
               <label className="block">
                 <span className="eyebrow">Title</span>
                 <input
