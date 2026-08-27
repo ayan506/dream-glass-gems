@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import { useSiteContent, displayNumber, type SiteContent } from "@/lib/site-content";
+import { useSiteContent, displayNumber, telLink, whatsappLink, type SiteContent } from "@/lib/site-content";
 import type { Faq } from "@/lib/assistant-faqs";
+import { LOGO_URL } from "./Brand";
 
 type Lang = "en" | "hi" | "hinglish";
 type Msg = { id: string; from: "bot" | "user"; text: string };
