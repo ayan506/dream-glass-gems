@@ -25,8 +25,10 @@ export function detectLang(text: string): Lang {
 
 function fill(text: string, c: SiteContent): string {
   const phones = c.contact.phones.filter(Boolean);
+  /** Always surface both contractor numbers wherever a phone is mentioned. */
+  const allPhones = (phones.length ? phones : [c.contact.whatsapp]).map(displayNumber).join(" / ");
   return text
-    .replace(/\{phone\}/g, displayNumber(phones[0] ?? c.contact.whatsapp))
+    .replace(/\{phone\}/g, allPhones)
     .replace(/\{phone2\}/g, displayNumber(phones[1] ?? phones[0] ?? c.contact.whatsapp))
     .replace(/\{whatsapp\}/g, displayNumber(c.contact.whatsapp))
     .replace(/\{hours\}/g, c.contact.hours)
