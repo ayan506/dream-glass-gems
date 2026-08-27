@@ -53,6 +53,16 @@ export type Contact = {
   mapQuery: string;
 };
 
+/** Google Search Console verification (HTML file and/or meta tag). */
+export type Seo = {
+  /** e.g. google1234abcd.html — served at the site root. */
+  gscFileName: string;
+  /** Raw contents of the verification file. */
+  gscFileContent: string;
+  /** content="..." value of the google-site-verification meta tag. */
+  gscMetaContent: string;
+};
+
 export type SiteContent = {
   products: Product[];
   testimonials: Testimonial[];
@@ -65,6 +75,7 @@ export type SiteContent = {
   brochure: Brochure;
   loader: Loader;
   assistant: AssistantSettings;
+  seo: Seo;
 };
 
 /** The ten grades/categories the catalogue is organised into. */
