@@ -285,3 +285,14 @@
   animation: float-y 7s ease-in-out infinite alternate;
 }
 
+
+/* Google Translate widget — keep the toolbar/banner completely out of the design. */
+.goog-te-banner-frame,
+.skiptranslate iframe,
+#goog-gt-tt,
+.goog-te-balloon-frame {
+  display: none !important;
+}
+body {
+  top: 0 !important;
+}
