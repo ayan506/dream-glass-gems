@@ -103,27 +103,55 @@ export function Assistant() {
     setInput("");
   };
 
+  const callNumbers = (contact.phones.filter(Boolean).length ? contact.phones.filter(Boolean) : [contact.whatsapp]);
+  const waHref = whatsappLink(contact.whatsapp, "Hi Dream Glass Collection, I need help with glass work.");
+
   return (
     <>
       <button
         onClick={() => setOpen((v) => !v)}
         aria-label={open ? "Close DG Assistant" : "Open DG Assistant"}
-        className="btn-primary fixed bottom-5 right-5 z-[70] h-14 rounded-full px-5 shadow-lg"
+        className="btn-primary fixed bottom-5 right-5 z-[70] flex h-14 items-center gap-2 rounded-full px-4 shadow-lg"
       >
-        {open ? "Close" : "DG Assistant"}
+        <img
+          src={LOGO_URL}
+          alt=""
+          width={32}
+          height={32}
+          className="h-8 w-8 rounded-full bg-background object-contain"
+        />
+        <span>{open ? "Close" : "DG Assistant"}</span>
       </button>
 
       {open && (
         <div className="glass-panel fixed bottom-24 right-4 z-[70] flex h-[70vh] max-h-[560px] w-[calc(100vw-2rem)] max-w-sm flex-col overflow-hidden rounded-2xl border border-border shadow-2xl">
-          <div className="flex items-center justify-between border-b border-border/60 px-4 py-3">
-            <div>
+          <div className="flex items-center gap-3 border-b border-border/60 px-4 py-3">
+            <img src={LOGO_URL} alt="" width={36} height={36} className="h-9 w-9 rounded-full object-contain" />
+            <div className="min-w-0 flex-1">
               <p className="text-sm font-semibold">{assistant.title}</p>
               <p className="text-[0.6rem] uppercase tracking-[0.26em] text-muted-foreground">
                 English · हिंदी · Hinglish
               </p>
             </div>
-            <a href={`tel:${contact.phones[0] ?? contact.whatsapp}`} className="text-xs text-primary">
-              Call
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2 border-b border-border/60 px-4 py-2">
+            {callNumbers.map((n) => (
+              <a
+                key={n}
+                href={telLink(n)}
+                className="rounded-full border border-border px-3 py-1 text-[0.65rem] text-primary"
+              >
+                Call {displayNumber(n)}
+              </a>
+            ))}
+            <a
+              href={waHref}
+              target="_blank"
+              rel="noreferrer"
+              className="rounded-full border border-primary/60 bg-primary/10 px-3 py-1 text-[0.65rem] text-primary"
+            >
+              WhatsApp {displayNumber(contact.whatsapp)}
             </a>
           </div>
 
