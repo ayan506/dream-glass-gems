@@ -60,6 +60,7 @@ const tabs = [
   "Assistant",
   "Brochure",
   "Loader",
+  "SEO",
   "Story",
   "Social",
   "Contact",
@@ -76,6 +77,33 @@ type QuoteRow = {
   status: string;
   created_at: string;
 };
+
+/** Loader duration input that lets you type any value freely (0.5 – 10 seconds). */
+function DurationField({ seconds, onCommit }: { seconds: number; onCommit: (secs: number) => void }) {
+  const [raw, setRaw] = useState(String(seconds));
+  useEffect(() => setRaw(String(seconds)), [seconds]);
+  return (
+    <label className="block">
+      <span className="eyebrow">Duration (seconds, 0.5 – 10)</span>
+      <input
+        type="number"
+        inputMode="decimal"
+        min={0.5}
+        max={10}
+        step={0.1}
+        value={raw}
+        onChange={(e) => setRaw(e.target.value)}
+        onBlur={() => {
+          const n = Number(raw);
+          const safe = Number.isFinite(n) && n > 0 ? Math.min(10, Math.max(0.5, n)) : 1.8;
+          setRaw(String(safe));
+          onCommit(safe);
+        }}
+        className={input}
+      />
+    </label>
+  );
+}
 
 /** Upload an image/PDF to the database, or paste a URL as a fallback. */
 function MediaField({
@@ -261,7 +289,7 @@ function Admin() {
     );
   }
 
-  const { assistant, brochure, loader, story, social, contact } = content;
+  const { assistant, brochure, loader, story, social, contact, seo } = content;
 
   return (
     <main className="min-h-screen bg-background pb-28">
@@ -911,6 +939,64 @@ function Admin() {
                 passcode={passcode}
                 onChange={(url) => set({ loader: { ...loader, logo: url } })}
               />
+            </div>
+          </Section>
+        )}
+
+        {tab === "SEO" && (
+          <Section title="Google Search Console verification">
+            <div className={card}>
+              <p className="text-xs text-muted-foreground">
+                Google gives you an HTML file such as <code>google1234abcd.html</code>. Upload it here and it is
+                served at <code>https://yoursite.com/google1234abcd.html</code>, then press Verify in Search Console.
+              </p>
+              <label className="block">
+                <span className="eyebrow">Verification file name</span>
+                <input
+                  value={seo.gscFileName}
+                  placeholder="google1234abcd.html"
+                  onChange={(e) => set({ seo: { ...seo, gscFileName: e.target.value.trim() } })}
+                  className={input}
+                />
+              </label>
+              <label className="btn-ghost inline-flex cursor-pointer text-foreground">
+                Upload verification file
+                <input
+                  type="file"
+                  accept=".html,text/html,text/plain"
+                  className="hidden"
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    e.target.value = "";
+                    if (!f) return;
+                    void f.text().then((text) =>
+                      set({ seo: { ...seo, gscFileName: f.name, gscFileContent: text.trim() } }),
+                    );
+                  }}
+                />
+              </label>
+              <label className="block">
+                <span className="eyebrow">File contents</span>
+                <textarea
+                  rows={3}
+                  value={seo.gscFileContent}
+                  onChange={(e) => set({ seo: { ...seo, gscFileContent: e.target.value } })}
+                  className={input}
+                />
+              </label>
+              {seo.gscFileName && seo.gscFileContent && (
+                <a
+                  href={`/${seo.gscFileName}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-xs text-primary underline"
+                >
+                  Open /{seo.gscFileName}
+                </a>
+              )}
+              <p className="text-xs text-muted-foreground">
+                Remember to press Save changes — the file goes live right after saving.
+              </p>
             </div>
           </Section>
         )}
