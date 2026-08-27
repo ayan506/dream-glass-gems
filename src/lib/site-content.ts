@@ -177,16 +177,17 @@ export const DEFAULT_CONTENT: SiteContent = {
   },
   loader: {
     enabled: true,
-    durationMs: 3000,
+    durationMs: 1800,
     title: "Dream Glass",
     tagline: "A Studio Of Designer Glasses",
     logo: "",
   },
   assistant: DEFAULT_ASSISTANT,
+  seo: { gscFileName: "", gscFileContent: "", gscMetaContent: "" },
 };
 
 /** Loader duration is capped to keep the entrance screen sane. */
-export const clampDuration = (ms: number) => Math.min(8000, Math.max(800, Math.round(ms) || 3000));
+export const clampDuration = (ms: number) => Math.min(10000, Math.max(500, Math.round(ms) || 1800));
 
 /** Fills any missing keys from the defaults so older saved payloads keep working. */
 export function mergeContent(parsed: Partial<SiteContent>): SiteContent {
@@ -223,6 +224,7 @@ export function mergeContent(parsed: Partial<SiteContent>): SiteContent {
       suggestions: parsed.assistant?.suggestions ?? DEFAULT_CONTENT.assistant.suggestions,
       faqs: parsed.assistant?.faqs ?? DEFAULT_CONTENT.assistant.faqs,
     },
+    seo: { ...DEFAULT_CONTENT.seo, ...(parsed.seo ?? {}) },
   };
 }
 
