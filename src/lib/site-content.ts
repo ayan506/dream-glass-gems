@@ -53,6 +53,16 @@ export type Contact = {
   mapQuery: string;
 };
 
+/** Google Search Console verification (HTML file and/or meta tag). */
+export type Seo = {
+  /** e.g. google1234abcd.html — served at the site root. */
+  gscFileName: string;
+  /** Raw contents of the verification file. */
+  gscFileContent: string;
+  /** content="..." value of the google-site-verification meta tag. */
+  gscMetaContent: string;
+};
+
 export type SiteContent = {
   products: Product[];
   testimonials: Testimonial[];
@@ -65,6 +75,7 @@ export type SiteContent = {
   brochure: Brochure;
   loader: Loader;
   assistant: AssistantSettings;
+  seo: Seo;
 };
 
 /** The ten grades/categories the catalogue is organised into. */
@@ -166,16 +177,17 @@ export const DEFAULT_CONTENT: SiteContent = {
   },
   loader: {
     enabled: true,
-    durationMs: 3000,
+    durationMs: 1800,
     title: "Dream Glass",
     tagline: "A Studio Of Designer Glasses",
     logo: "",
   },
   assistant: DEFAULT_ASSISTANT,
+  seo: { gscFileName: "", gscFileContent: "", gscMetaContent: "" },
 };
 
 /** Loader duration is capped to keep the entrance screen sane. */
-export const clampDuration = (ms: number) => Math.min(8000, Math.max(800, Math.round(ms) || 3000));
+export const clampDuration = (ms: number) => Math.min(10000, Math.max(500, Math.round(ms) || 1800));
 
 /** Fills any missing keys from the defaults so older saved payloads keep working. */
 export function mergeContent(parsed: Partial<SiteContent>): SiteContent {
@@ -212,6 +224,7 @@ export function mergeContent(parsed: Partial<SiteContent>): SiteContent {
       suggestions: parsed.assistant?.suggestions ?? DEFAULT_CONTENT.assistant.suggestions,
       faqs: parsed.assistant?.faqs ?? DEFAULT_CONTENT.assistant.faqs,
     },
+    seo: { ...DEFAULT_CONTENT.seo, ...(parsed.seo ?? {}) },
   };
 }
 

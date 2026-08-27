@@ -63,9 +63,9 @@ export const DEFAULT_FAQS: Faq[] = [
   f(
     "g3",
     "hello, hi, hey, hii, hlo, gm, good morning, good evening, good afternoon",
-    "Hello! I'm the DG Assistant. Ask me about products, prices, installation time or booking a free site visit.",
-    "नमस्ते! मैं DG असिस्टेंट हूँ। प्रोडक्ट, कीमत, इंस्टॉलेशन टाइम या फ्री साइट विज़िट के बारे में पूछिए।",
-    "Hello! Main DG Assistant hoon. Products, price, installation time ya free site visit ke baare me poochh sakte hain.",
+    "Hello! I'm the DG Assistant. Ask me about products, prices, installation time or booking a site visit.",
+    "नमस्ते! मैं DG असिस्टेंट हूँ। प्रोडक्ट, कीमत, इंस्टॉलेशन टाइम या साइट विज़िट के बारे में पूछिए।",
+    "Hello! Main DG Assistant hoon. Products, price, installation time ya site visit ke baare me poochh sakte hain.",
   ),
   f(
     "g4",
@@ -223,9 +223,9 @@ export const DEFAULT_FAQS: Faq[] = [
   f(
     "q1",
     "price, rate, cost, kitna, kimat, कीमत, दाम, charge, quotation, quote, estimate, budget",
-    "Pricing depends on glass thickness, hardware and total area, so we quote after a measurement. Share your size on WhatsApp {whatsapp} or call {phone} for a same-day estimate — site survey is free.",
-    "कीमत ग्लास की मोटाई, हार्डवेयर और कुल एरिया पर निर्भर करती है, इसलिए नाप के बाद ही सही रेट बताते हैं। {whatsapp} पर साइज़ भेजें या {phone} पर कॉल करें — साइट सर्वे फ्री है।",
-    "Price glass ki thickness, hardware aur total area par depend karta hai, isliye measurement ke baad hi exact rate batate hain. {whatsapp} par size bhejiye ya {phone} par call kijiye — site survey free hai.",
+    "Pricing depends on glass thickness, hardware and total area, so we quote after a measurement. Share your size on WhatsApp {whatsapp} or call {phone} for a same-day estimate after a site visit.",
+    "कीमत ग्लास की मोटाई, हार्डवेयर और कुल एरिया पर निर्भर करती है, इसलिए नाप के बाद ही सही रेट बताते हैं। {whatsapp} पर साइज़ भेजें या {phone} पर कॉल करें — साइट विज़िट के बाद सही रेट बताया जाता है।",
+    "Price glass ki thickness, hardware aur total area par depend karta hai, isliye measurement ke baad hi exact rate batate hain. {whatsapp} par size bhejiye ya {phone} par call kijiye — site visit ke baad exact rate batate hain.",
   ),
   f(
     "q2",
@@ -237,9 +237,9 @@ export const DEFAULT_FAQS: Faq[] = [
   f(
     "q3",
     "site visit, survey, measurement, naap, visit, माप, सर्वे, inspection",
-    "Site survey and measurement are free. Book on {phone} and we'll schedule a visit at your convenience.",
-    "साइट सर्वे और माप फ्री है। {phone} पर बुक करें, आपकी सुविधा के अनुसार विज़िट तय कर देंगे।",
-    "Site survey aur measurement free hai. {phone} par book kijiye, aapki convenience se visit schedule kar denge.",
+    "Site visit and measurement can be booked on {phone} and we'll schedule a visit at your convenience.",
+    "साइट विज़िट और माप के लिए {phone} पर बुक करें, आपकी सुविधा के अनुसार विज़िट तय कर देंगे।",
+    "Site visit aur measurement ke liye {phone} par book kijiye, aapki convenience se visit schedule kar denge.",
   ),
   f(
     "q4",
@@ -394,11 +394,11 @@ export const DEFAULT_ASSISTANT: AssistantSettings = {
   enabled: true,
   title: "DG Assistant",
   welcomeEn:
-    "Hello! I'm the DG Assistant. Ask me about products, prices, timelines or booking a free site visit.",
+    "Hello! I'm the DG Assistant. Ask me about products, prices, timelines or booking a site visit.",
   welcomeHi:
-    "नमस्ते! मैं DG असिस्टेंट हूँ। प्रोडक्ट, कीमत, समय या फ्री साइट विज़िट के बारे में पूछिए।",
+    "नमस्ते! मैं DG असिस्टेंट हूँ। प्रोडक्ट, कीमत, समय या साइट विज़िट के बारे में पूछिए।",
   welcomeHinglish:
-    "Hello! Main DG Assistant hoon. Products, price, timeline ya free site visit ke baare me poochhiye.",
+    "Hello! Main DG Assistant hoon. Products, price, timeline ya site visit ke baare me poochhiye.",
   fallbackEn:
     "I don't have that answer yet. Please call our contractor directly on {phone} — the team will help you right away. (WhatsApp: {whatsapp})",
   fallbackHi:

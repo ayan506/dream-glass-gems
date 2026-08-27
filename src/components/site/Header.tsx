@@ -1,19 +1,22 @@
 import { useEffect, useState } from "react";
 import { Logo } from "./Brand";
 import { useSiteContent, whatsappLink } from "@/lib/site-content";
-
-const links = [
-  { label: "Services", href: "#services" },
-  { label: "Story", href: "#story" },
-  { label: "Products", href: "#products" },
-  { label: "Projects", href: "#projects" },
-  { label: "Contact", href: "#contact" },
-];
+import { TranslateToggle } from "./TranslateToggle";
 
 export function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
-  const { contact } = useSiteContent();
+  const { contact, brochure } = useSiteContent();
+  const links = [
+    { label: "Services", href: "#services" },
+    { label: "Story", href: "#story" },
+    { label: "Products", href: "#products" },
+    { label: "Gallery", href: "#gallery" },
+    { label: "Projects", href: "#projects" },
+    // Brochure only appears once a PDF is actually uploaded and enabled.
+    ...(brochure.enabled && brochure.url ? [{ label: "Brochure", href: "#brochure" }] : []),
+    { label: "Contact", href: "#contact" },
+  ];
   const waLink = whatsappLink(contact.whatsapp, "Hi Dream Glass Collection, I would like to enquire about your glass solutions.");
 
   useEffect(() => {
@@ -42,7 +45,7 @@ export function Header() {
           </span>
         </a>
 
-        <nav className="hidden items-center gap-9 lg:flex">
+        <nav className="hidden items-center gap-7 lg:flex">
           {links.map((l) => (
             <a
               key={l.href}
@@ -54,7 +57,8 @@ export function Header() {
           ))}
         </nav>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <TranslateToggle />
           <a href={waLink} target="_blank" rel="noreferrer" className="btn-primary hidden sm:inline-flex">
             WhatsApp Now
           </a>

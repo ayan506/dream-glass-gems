@@ -23,7 +23,7 @@ export function Gallery({
         </p>
       </Reveal>
 
-      <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-14 grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-3">
         {items.map((g, i) => (
           <Reveal key={g.id} delay={(i % 3) * 90}>
             <button
@@ -50,10 +50,10 @@ export function Gallery({
                       className="pointer-events-none absolute inset-0 rounded-[1.5rem] ring-1 ring-inset ring-white/15"
                     />
                   </div>
-                  <div className="p-5">
+                  <div className="p-3 sm:p-5">
                     <p className="text-[0.6rem] uppercase tracking-[0.3em] text-primary">{g.cat}</p>
-                    <h3 className="mt-2 text-lg font-semibold">{g.title}</h3>
-                    <p className="mt-1 text-xs text-muted-foreground">{g.caption}</p>
+                    <h3 className="mt-2 text-sm font-semibold sm:text-lg">{g.title}</h3>
+                    <p className="mt-1 hidden text-xs text-muted-foreground sm:block">{g.caption}</p>
                   </div>
                 </div>
               </div>
